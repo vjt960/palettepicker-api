@@ -151,3 +151,62 @@ describe('Palette Picker API', () => {
     });
   });
 
+  describe('POST /api/v1/users/projects/new', () => {
+    it('should return a status of 201 with the ID of the new project', async () => {
+      const testUser = await database('users')
+        .first()
+        .select();
+      const mockBody = {
+        id: testUser.id,
+        name: 'new_Project001',
+        description: 'example description text'
+      };
+      const response = await request(app)
+        .post('/api/v1/users/projects/new')
+        .send(mockBody);
+      const result = response.body;
+      const expected = await database('projects')
+        .where('id', ...result)
+        .select('id')
+        .then(project => project[0]);
+
+      expect(response.status).toBe(201);
+      expect(...result).toEqual(expected.id);
+    });
+
+    it('should return a status of 422 if request body is invalid', async () => {
+      let invalidID = 1;
+      const validIDs = await database('users')
+        .select('id')
+        .then(users => users.map(obj => obj.id));
+      while (validIDs.includes(invalidID)) {
+        invalidID++;
+        return;
+      }
+      const mockBody1 = {
+        id: invalidID,
+        name: 'new_Project001',
+        description: 'example description text'
+      };
+      const mockBody2 = {
+        name: 'new_Project002',
+        description: 'example description text'
+      };
+      const response1 = await request(app)
+        .post('/api/v1/users/projects/new')
+        .send(mockBody1);
+      const response2 = await request(app)
+        .post('/api/v1/users/projects/new')
+        .send(mockBody2);
+      const result1 = response1.body;
+      const result2 = response2.body;
+      const expected1 = { error: `${invalidID} is NOT a valid user ID.` };
+      const expected2 = { error: 'User ID not present in payload.' };
+
+      expect(response1.status).toBe(422);
+      expect(result1).toEqual(expected1);
+      expect(response2.status).toBe(422);
+      expect(result2).toEqual(expected2);
+    });
+  });
+
