@@ -59,3 +59,42 @@ describe('Palette Picker API', () => {
     });
   });
 
+  describe('POST /api/v1/users/new', () => {
+    it('should return a status of 201 and userID when creating a new user', async () => {
+      const mockBody = {
+        username: `NewUser ${Date.now()}`,
+        password: 'password'
+      };
+      const response = await request(app)
+        .post('/api/v1/users/new')
+        .send(mockBody);
+      const result = response.body;
+      const expected = await database('users')
+        .where('id', ...result)
+        .select()
+        .then(user => user[0]);
+
+      expect(response.status).toBe(201);
+      expect(...result).toEqual(expected.id);
+    });
+
+    it('should return a status of 409 if a username is already taken', async () => {
+      const testUser = await database('users')
+        .first()
+        .select();
+      const mockBody = {
+        username: testUser.username,
+        password: 'fake_password'
+      };
+      const response = await request(app)
+        .post('/api/v1/users/new')
+        .send(mockBody);
+      const result = response.body;
+      const expected = {
+        error: `Username: ${testUser.username} is already taken.`
+      };
+
+      expect(response.status).toBe(409);
+      expect(result).toEqual(expected);
+    });
+  });
