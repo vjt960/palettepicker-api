@@ -98,3 +98,30 @@ describe('Palette Picker API', () => {
       expect(result).toEqual(expected);
     });
   });
+
+  describe('GET /api/v1/users/:user_id/projects', () => {
+    it('should return a status of 200 and projects of the user', async () => {
+      const expectedUser = await database('users')
+        .first()
+        .select();
+      const response = await request(app).get(
+        `/api/v1/users/${expectedUser.id}/projects`
+      );
+      const result = response.body;
+      const expected = await database('projects')
+        .where('user_id', expectedUser.id)
+        .select('id', 'name');
+
+      expect(response.status).toEqual(200);
+      expect(result).toEqual(expected);
+    });
+
+    it('should return a status of 404 if the request params do not match', async () => {
+      const response = await request(app).get('/api/v1/users/x99/projects');
+      const result = response.body;
+      const expected = { error: 'Invalid user_id in params.' };
+
+      expect(response.status).toBe(404);
+      expect(result).toEqual(expected);
+    });
+  });
