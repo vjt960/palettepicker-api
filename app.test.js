@@ -125,3 +125,29 @@ describe('Palette Picker API', () => {
       expect(result).toEqual(expected);
     });
   });
+
+  describe('GET /api/v1/users/:user_id/projects/:project_id', () => {
+    it('should return a status of 200 and an entire project object by project.id', async () => {
+      const project = ['id', 'user_id', 'name', 'description'];
+      const expected = await database('projects')
+        .first()
+        .select(...project);
+      const response = await request(app).get(
+        `/api/v1/users/${expected.user_id}/projects/${expected.id}`
+      );
+      const result = response.body;
+
+      expect(response.status).toBe(200);
+      expect(...result).toEqual(expected);
+    });
+
+    it('should return a status of 404 if request params do not match', async () => {
+      const response = await request(app).get('/api/v1/users/x9/projects/x8');
+      const result = response.body;
+      const expected = { error: 'Invalid values within params.' };
+
+      expect(response.status).toBe(404);
+      expect(result).toEqual(expected);
+    });
+  });
+
