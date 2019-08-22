@@ -2,4 +2,8 @@ language: node_js
 node_js:
   - "node" 
 before_install: 
-  - npm install --save-dev jest
+  - npm install --save-dev jest 
+services:
+  - postgresql
+before_script:
+  - psql -c 'CREATE DATABASE palettepicker_test;' -U postgres
