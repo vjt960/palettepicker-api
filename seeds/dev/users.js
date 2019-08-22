@@ -1,4 +1,4 @@
-const users_data = require('../database/default_data/users_data.js');
+const users_data = require('../../database/default_data/users_data.js');
 
 exports.seed = knex => {
   return knex('palettes')
