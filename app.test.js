@@ -62,7 +62,7 @@ describe('Palette Picker API', () => {
   describe('POST /api/v1/users/new', () => {
     it('should return a status of 201 and userID when creating a new user', async () => {
       const mockBody = {
-        username: `NewUser ${Date.now()}`,
+        username: `NewUser`,
         password: 'password'
       };
       const response = await request(app)
@@ -213,6 +213,7 @@ describe('Palette Picker API', () => {
   describe('PATCH /api/v1/users/projects/:id/edit', () => {
     // it should update project name by ID
     // response will be
+    expect(true).toEqual(true);
   });
 
   describe('DELETE /api/v1/users/:user_id/projects/:id', () => {
