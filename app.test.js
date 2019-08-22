@@ -210,3 +210,22 @@ describe('Palette Picker API', () => {
     });
   });
 
+  describe('PATCH /api/v1/users/projects/:id/edit', () => {
+    // it should update project name by ID
+    // response will be
+  });
+
+  describe('DELETE /api/v1/users/:user_id/projects/:id', () => {
+    // it should delete all palette rows with the matching project_id
+    // it should delete the selected project
+    // response will be message
+  });
+
+  describe('GET /api/v1/users/:user_id/projects/:id/palettes', () => {
+    // it should return all palettes of specified project
+  });
+
+  describe('GET /api/v1/users/:user_id/palettes', () => {
+    // return all palettes belonging to any project of the user
+  });
+});
