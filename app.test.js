@@ -189,6 +189,21 @@ describe('Palette Picker API', () => {
       expect(...result).toEqual(expected.id);
     });
 
+    it('should return a status of 404 if user_id is not in payload', async () => {
+      const mockBody = {
+        name: 'new_Project002',
+        description: 'example description text'
+      };
+      const response = await request(app)
+        .post('/api/v1/users/projects/new')
+        .send(mockBody);
+      const result = response.body;
+      const expected = { error: 'User ID not present in payload.' };
+
+      expect(response.status).toBe(404);
+      expect(result).toEqual(expected);
+    });
+
     it('should return a status of 422 if request body is invalid', async () => {
       let invalidID = 1;
       const validIDs = await database('users')
