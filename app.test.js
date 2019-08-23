@@ -113,7 +113,8 @@ describe('Palette Picker API', () => {
         .select('id', 'name');
 
       expect(response.status).toEqual(200);
-      expect(result).toEqual(expected);
+      expect(result.id).toEqual(expected.id);
+      expect(result.id).toEqual(expected.title);
     });
 
     it('should return a status of 404 if the request params do not match', async () => {
