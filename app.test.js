@@ -120,7 +120,7 @@ describe('Palette Picker API', () => {
     it('should return a status of 404 if the request params do not match', async () => {
       const response = await request(app).get('/api/v1/users/x99/projects');
       const result = response.body;
-      const expected = { error: 'Invalid user_id in params.' };
+      const expected = { error: 'Invalid user_id.' };
 
       expect(response.status).toBe(404);
       expect(result).toEqual(expected);
