@@ -113,13 +113,28 @@ describe('Palette Picker API', () => {
         .select('id', 'name');
 
       expect(response.status).toEqual(200);
-      expect(result).toEqual(expected);
+      expect(result.id).toEqual(expected.id);
+      expect(result.id).toEqual(expected.title);
     });
 
     it('should return a status of 404 if the request params do not match', async () => {
       const response = await request(app).get('/api/v1/users/x99/projects');
       const result = response.body;
-      const expected = { error: 'Invalid user_id in params.' };
+      const expected = { error: 'Invalid user_id.' };
+
+      expect(response.status).toBe(404);
+      expect(result).toEqual(expected);
+    });
+
+    it('should return a status of 404 if the user has no projects', async () => {
+      const newUserID = await database('users')
+        .insert({ username: 'Kanye', password: 'genius' }, 'id')
+        .then(obj => obj[0]);
+      const response = await request(app).get(
+        `/api/v1/users/${newUserID}/projects`
+      );
+      const result = response.body;
+      const expected = { error: 'No projects found under user_id.' };
 
       expect(response.status).toBe(404);
       expect(result).toEqual(expected);
@@ -174,59 +189,134 @@ describe('Palette Picker API', () => {
       expect(...result).toEqual(expected.id);
     });
 
+    it('should return a status of 404 if user_id is not in payload', async () => {
+      const mockBody = {
+        name: 'new_Project002',
+        description: 'example description text'
+      };
+      const response = await request(app)
+        .post('/api/v1/users/projects/new')
+        .send(mockBody);
+      const result = response.body;
+      const expected = { error: 'User ID not present in payload.' };
+
+      expect(response.status).toBe(404);
+      expect(result).toEqual(expected);
+    });
+
     it('should return a status of 422 if request body is invalid', async () => {
-      let invalidID = 1;
-      const validIDs = await database('users')
-        .select('id')
-        .then(users => users.map(obj => obj.id));
-      while (validIDs.includes(invalidID)) {
-        invalidID++;
-        return;
-      }
-      const mockBody1 = {
+      const invalidID = await database('users')
+        .max('id')
+        .then(obj => obj[0]['max'] + 1);
+      const mockBody = {
         id: invalidID,
         name: 'new_Project001',
         description: 'example description text'
       };
-      const mockBody2 = {
-        name: 'new_Project002',
-        description: 'example description text'
-      };
-      const response1 = await request(app)
+      const response = await request(app)
         .post('/api/v1/users/projects/new')
-        .send(mockBody1);
-      const response2 = await request(app)
-        .post('/api/v1/users/projects/new')
-        .send(mockBody2);
-      const result1 = response1.body;
-      const result2 = response2.body;
-      const expected1 = { error: `${invalidID} is NOT a valid user ID.` };
-      const expected2 = { error: 'User ID not present in payload.' };
+        .send(mockBody);
+      const result = response.body;
+      const expected = { error: `${invalidID} is NOT a valid user ID.` };
 
-      expect(response1.status).toBe(422);
-      expect(result1).toEqual(expected1);
-      expect(response2.status).toBe(422);
-      expect(result2).toEqual(expected2);
+      expect(response.status).toBe(422);
+      expect(result).toEqual(expected);
+    });
+
+    it('should return a status of 409 if a project exists with the same name', async () => {
+      const testProject = await database('projects').first();
+      const mockBody = {
+        id: testProject.user_id,
+        name: testProject.name,
+        description: 'example text...'
+      };
+      const response = await request(app)
+        .post('/api/v1/users/projects/new')
+        .send(mockBody);
+      const result = response.body;
+      const expected = {
+        error: `${testProject.name} already exists. Choose a different name.`
+      };
+
+      expect(response.status).toBe(409);
+      expect(result).toEqual(expected);
     });
   });
 
   describe('PATCH /api/v1/users/projects/:id/edit', () => {
-    // it should update project name by ID
-    // response will be
-    expect(true).toEqual(true);
+    it('should edit the name of a project selected by id', async () => {
+      const testProject = await database('projects').first();
+      const mockBody = { name: 'BrandNewName', description: '' };
+      const response = await request(app)
+        .patch(`/api/v1/users/projects/${testProject.id}/edit`)
+        .send(mockBody);
+      const result = response.body.name;
+      const expected = mockBody.name;
+      expect(response.status).toBe(202);
+      expect(result).toEqual(expected);
+    });
+
+    it('should return a status of 422 if the request body is invalid', async () => {
+      const testProject = await database('projects').first();
+      const mockBody = { description: 'yeet' };
+      const response = await request(app)
+        .patch(`/api/v1/users/projects/${testProject.id}/edit`)
+        .send(mockBody);
+      const result = response.body;
+      const expected = { error: 'Project name not found in payload.' };
+      expect(response.status).toBe(422);
+      expect(result).toEqual(expected);
+    });
+
+    it('should return a status of 404 if the params id is invalid', async () => {
+      const invalidID = await database('projects')
+        .max('id')
+        .then(obj => obj[0]['max'] + 1);
+      const mockBody = { name: 'BrandNewName', description: '' };
+      const response = await request(app)
+        .patch(`/api/v1/users/projects/${invalidID}/edit`)
+        .send(mockBody);
+      const result = response.body;
+      const expected = {
+        error: `Project id: ${invalidID} not found.`
+      };
+
+      expect(response.status).toBe(404);
+      expect(result).toEqual(expected);
+    });
   });
 
   describe('DELETE /api/v1/users/:user_id/projects/:id', () => {
-    // it should delete all palette rows with the matching project_id
-    // it should delete the selected project
-    // response will be message
+    it('should return a status of 202 and delete a project with associated palettes', async () => {
+      const testProject = await database('projects')
+        .first()
+        .then(obj => obj);
+      const response = await request(app).delete(
+        `/api/v1/users/${testProject.user_id}/projects/${testProject.id}`
+      );
+      const result = response.body;
+      const expected = testProject.id;
+
+      expect(response.status).toBe(202);
+      expect(result).toEqual(expected);
+    });
   });
 
-  describe('GET /api/v1/users/:user_id/projects/:id/palettes', () => {
-    // it should return all palettes of specified project
-  });
+  // describe('GET /api/v1/users/:user_id/projects/:id/palettes', () => {
+  //   // it should return all palettes of specified project
+  // });
 
   describe('GET /api/v1/users/:user_id/palettes', () => {
-    // return all palettes belonging to any project of the user
+    it('returns a status of 200 and all palettes of projects belonging to the user', async () => {
+      const testUser = await database('users')
+        .first()
+        .then(obj => obj);
+      const response = await request(app).get(
+        `/api/v1/users/${testUser.id}/palettes`
+      );
+      const result = response.status;
+
+      expect(result).toBe(200);
+    });
   });
 });
