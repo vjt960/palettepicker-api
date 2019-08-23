@@ -244,9 +244,18 @@ describe('Palette Picker API', () => {
   });
 
   describe('PATCH /api/v1/users/projects/:id/edit', () => {
-    // it should update project name by ID
-    // response will be
-    expect(true).toEqual(true);
+    it('should edit the name of a project selected by id', async () => {
+      const testProject = await database('projects').first();
+      const mockBody = { name: 'BrandNewName', description: '' };
+      const response = await request(app)
+        .patch(`/api/v1/users/projects/${testProject.id}/edit`)
+        .send(mockBody);
+      const result = response.body.name;
+      const expected = mockBody.name;
+      expect(response.status).toBe(202);
+      expect(result).toEqual(expected);
+    });
+
   });
 
   describe('DELETE /api/v1/users/:user_id/projects/:id', () => {
