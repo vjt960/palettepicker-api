@@ -205,38 +205,41 @@ describe('Palette Picker API', () => {
     });
 
     it('should return a status of 422 if request body is invalid', async () => {
-      let invalidID = 1;
-      const validIDs = await database('users')
-        .select('id')
-        .then(users => users.map(obj => obj.id));
-      while (validIDs.includes(invalidID)) {
-        invalidID++;
-        return;
-      }
-      const mockBody1 = {
+      const invalidID = await database('users')
+        .max('id')
+        .then(obj => obj[0]['max'] + 1);
+      const mockBody = {
         id: invalidID,
         name: 'new_Project001',
         description: 'example description text'
       };
-      const mockBody2 = {
-        name: 'new_Project002',
-        description: 'example description text'
-      };
-      const response1 = await request(app)
+      const response = await request(app)
         .post('/api/v1/users/projects/new')
-        .send(mockBody1);
-      const response2 = await request(app)
-        .post('/api/v1/users/projects/new')
-        .send(mockBody2);
-      const result1 = response1.body;
-      const result2 = response2.body;
-      const expected1 = { error: `${invalidID} is NOT a valid user ID.` };
-      const expected2 = { error: 'User ID not present in payload.' };
+        .send(mockBody);
+      const result = response.body;
+      const expected = { error: `${invalidID} is NOT a valid user ID.` };
 
-      expect(response1.status).toBe(422);
-      expect(result1).toEqual(expected1);
-      expect(response2.status).toBe(422);
-      expect(result2).toEqual(expected2);
+      expect(response.status).toBe(422);
+      expect(result).toEqual(expected);
+    });
+
+    it('should return a status of 409 if a project exists with the same name', async () => {
+      const testProject = await database('projects').first();
+      const mockBody = {
+        id: testProject.user_id,
+        name: testProject.name,
+        description: 'example text...'
+      };
+      const response = await request(app)
+        .post('/api/v1/users/projects/new')
+        .send(mockBody);
+      const result = response.body;
+      const expected = {
+        error: `${testProject.name} already exists. Choose a different name.`
+      };
+
+      expect(response.status).toBe(409);
+      expect(result).toEqual(expected);
     });
   });
 
