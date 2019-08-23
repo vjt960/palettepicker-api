@@ -268,6 +268,24 @@ describe('Palette Picker API', () => {
       expect(result).toEqual(expected);
   });
 
+    it('should return a status of 404 if the params id is invalid', async () => {
+      const invalidID = await database('projects')
+        .max('id')
+        .then(obj => obj[0]['max'] + 1);
+      const mockBody = { name: 'BrandNewName', description: '' };
+      const response = await request(app)
+        .patch(`/api/v1/users/projects/${invalidID}/edit`)
+        .send(mockBody);
+      const result = response.body;
+      const expected = {
+        error: `Project id: ${invalidID} not found.`
+      };
+
+      expect(response.status).toBe(404);
+      expect(result).toEqual(expected);
+    });
+  });
+
   describe('DELETE /api/v1/users/:user_id/projects/:id', () => {
     // it should delete all palette rows with the matching project_id
     // it should delete the selected project
