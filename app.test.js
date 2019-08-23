@@ -307,6 +307,16 @@ describe('Palette Picker API', () => {
   // });
 
   describe('GET /api/v1/users/:user_id/palettes', () => {
-    // return all palettes belonging to any project of the user
+    it('returns a status of 200 and all palettes of projects belonging to the user', async () => {
+      const testUser = await database('users')
+        .first()
+        .then(obj => obj);
+      const response = await request(app).get(
+        `/api/v1/users/${testUser.id}/palettes`
+      );
+      const result = response.status;
+
+      expect(result).toBe(200);
+    });
   });
 });
