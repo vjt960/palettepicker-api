@@ -125,6 +125,20 @@ describe('Palette Picker API', () => {
       expect(response.status).toBe(404);
       expect(result).toEqual(expected);
     });
+
+    it('should return a status of 404 if the user has no projects', async () => {
+      const newUserID = await database('users')
+        .insert({ username: 'Kanye', password: 'genius' }, 'id')
+        .then(obj => obj[0]);
+      const response = await request(app).get(
+        `/api/v1/users/${newUserID}/projects`
+      );
+      const result = response.body;
+      const expected = { error: 'No projects found under user_id.' };
+
+      expect(response.status).toBe(404);
+      expect(result).toEqual(expected);
+  });
   });
 
   describe('GET /api/v1/users/:user_id/projects/:project_id', () => {
