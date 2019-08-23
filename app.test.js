@@ -138,7 +138,7 @@ describe('Palette Picker API', () => {
 
       expect(response.status).toBe(404);
       expect(result).toEqual(expected);
-  });
+    });
   });
 
   describe('GET /api/v1/users/:user_id/projects/:project_id', () => {
@@ -266,7 +266,7 @@ describe('Palette Picker API', () => {
       const expected = { error: 'Project name not found in payload.' };
       expect(response.status).toBe(422);
       expect(result).toEqual(expected);
-  });
+    });
 
     it('should return a status of 404 if the params id is invalid', async () => {
       const invalidID = await database('projects')
@@ -299,7 +299,7 @@ describe('Palette Picker API', () => {
 
       expect(response.status).toBe(202);
       expect(result).toEqual(expected);
-  });
+    });
   });
 
   // describe('GET /api/v1/users/:user_id/projects/:id/palettes', () => {
