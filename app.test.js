@@ -287,14 +287,24 @@ describe('Palette Picker API', () => {
   });
 
   describe('DELETE /api/v1/users/:user_id/projects/:id', () => {
-    // it should delete all palette rows with the matching project_id
-    // it should delete the selected project
-    // response will be message
+    it('should return a status of 202 and delete a project with associated palettes', async () => {
+      const testProject = await database('projects')
+        .first()
+        .then(obj => obj);
+      const response = await request(app).delete(
+        `/api/v1/users/${testProject.user_id}/projects/${testProject.id}`
+      );
+      const result = response.body;
+      const expected = testProject.id;
+
+      expect(response.status).toBe(202);
+      expect(result).toEqual(expected);
+  });
   });
 
-  describe('GET /api/v1/users/:user_id/projects/:id/palettes', () => {
-    // it should return all palettes of specified project
-  });
+  // describe('GET /api/v1/users/:user_id/projects/:id/palettes', () => {
+  //   // it should return all palettes of specified project
+  // });
 
   describe('GET /api/v1/users/:user_id/palettes', () => {
     // return all palettes belonging to any project of the user
