@@ -256,6 +256,16 @@ describe('Palette Picker API', () => {
       expect(result).toEqual(expected);
     });
 
+    it('should return a status of 422 if the request body is invalid', async () => {
+      const testProject = await database('projects').first();
+      const mockBody = { description: 'yeet' };
+      const response = await request(app)
+        .patch(`/api/v1/users/projects/${testProject.id}/edit`)
+        .send(mockBody);
+      const result = response.body;
+      const expected = { error: 'Project name not found in payload.' };
+      expect(response.status).toBe(422);
+      expect(result).toEqual(expected);
   });
 
   describe('DELETE /api/v1/users/:user_id/projects/:id', () => {
