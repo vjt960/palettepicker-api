@@ -319,4 +319,40 @@ describe('Palette Picker API', () => {
       expect(result).toBe(200);
     });
   });
+
+  describe('POST /api/v1/users/projects/:project_id/palettes', () => {
+    it('returns a status of 201 and adds a new palette to a project', async () => {
+      const testProject = await database('projects')
+        .first()
+        .then(obj => obj);
+      const mockBody = {
+        name: 'brandNewPalette',
+        colors: ['#ffffff', '#000000', '#e7e7e7'],
+        project_id: testProject.id
+      };
+      const response = await request(app)
+        .post(`/api/v1/users/projects/${testProject.id}/palettes`)
+        .send(mockBody);
+      const result = response.body;
+      const expected = await database('palettes')
+        .where('id', ...result)
+        .select('id')
+        .then(palette => palette[0]);
+
+      expect(response.status).toBe(201);
+      expect(...result).toEqual(expected.id);
+    });
+
+    it('returns a status of 422 if the request body is invalid', async () => {
+      const mockBody = { wrongKey: 'yeet', name: 'RubberDuck' };
+      const response = await request(app)
+        .post(`/api/v1/users/projects/9/palettes`)
+        .send(mockBody);
+      const result = response.body;
+      const expected = { error: 'name and colors not included in payload.' };
+
+      expect(response.status).toBe(422);
+      expect(result).toEqual(expected);
+    });
+  });
 });

@@ -204,6 +204,24 @@ app.get('/api/v1/users/:user_id/palettes', (request, response) => {
   }
 });
 
+app.post('/api/v1/users/projects/:project_id/palettes', (request, response) => {
+  const { project_id } = request.params;
+  const { name, colors } = request.body;
+  try {
+    if (name && colors) {
+      database('palettes')
+        .insert({ name, colors: JSON.stringify(colors), project_id }, 'id')
+        .then(id => response.status(201).json(id));
+    } else {
+      return response
+        .status(422)
+        .json({ error: 'name and colors not included in payload.' });
+    }
+  } catch {
+    return response.sendStatus(500);
+  }
+});
+
 // app.listen(app.get('port'), () => {
 //   console.log(
 //     `${app.locals.title} is running SHIT on http://localhost:${app.get(
