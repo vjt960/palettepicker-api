@@ -47,7 +47,7 @@ app.post('/api/v1/users/new', async (request, response) => {
         .send({ error: `Username: ${username} is already taken.` });
     } else {
       const id = await database('users').insert({ username, password }, 'id');
-      response.status(201).send(id);
+      response.status(201).send({ id: id[0] });
     }
   } catch {
     return response.sendStatus(500);

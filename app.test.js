@@ -69,13 +69,16 @@ describe('Palette Picker API', () => {
         .post('/api/v1/users/new')
         .send(mockBody);
       const result = response.body;
+      console.log(result);
       const expected = await database('users')
-        .where('id', ...result)
-        .select()
-        .then(user => user[0]);
+        .where('id', result.id)
+        .select('id')
+        .then(user => {
+          return { id: user[0] };
+        });
 
       expect(response.status).toBe(201);
-      expect(...result).toEqual(expected.id);
+      expect(result).toEqual(expected.id);
     });
 
     it('should return a status of 409 if a username is already taken', async () => {
