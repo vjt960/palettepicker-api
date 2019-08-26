@@ -7,8 +7,45 @@
   <title>Palette Picker API | README</title>
 </head>
 <body>
-  <h1>Palette Picker Database</h1>
-  <h2>::API is online...</h2>
-  <p>README under construction...</p>
-</body>
+  <h1>Palette Picker API</h1>
+  <a href="https://github.com/KevinKra/PalettePicker-be/blob/master/README.md">.:Palette Picker API README:.</a>
+  <style type="text/css">
+    h1, a {
+      text-align: center; font-family: "Comfortaa", cursive;
+    }
+    .tftable {
+      font-size:12px;color:#333333;width:100%;border-width: 1px;border-color: #729ea5;border-collapse: collapse;
+    }
+    .tftable th { 
+      font-size:12px;background-color:#acc8cc;border-width: 1px;padding: 8px;border-style: solid;border-color: #729ea5;text-align:left;
+    }
+    .tftable tr { 
+      background-color:#d4e3e5;
+    }
+    .tftable td { 
+      font-size:12px;border-width: 1px;padding: 8px;border-style: solid;border-color: #729ea5;
+    }
+    .tftable tr:hover { 
+      background-color:#ffffff;
+    }
+  </style>
+
+  <table class="tftable" border="1">
+    <tr><th>URL</th><th>METHOD</th><th>Options</th><th>Response</th></tr>
+    <tr><td>/api/v1/users</td><td>POST</td><td>{name: 'string', password: 'string'}</td><td>ID of user</td></tr>
+    <tr><td>/api/v1/users/new</td><td>POST</td><td>{name: 'string', password: 'string'}</td><td>ID of created user</td></tr>
+    <tr><td>/api/v1/users/:user_id/projects</td><td>GET</td><td>Not Required</td><td>Array of Project objects with their associated palettes</td></tr>
+    <tr><td>/api/v1/users/:user_id/projects/:project_id</td><td>GET</td><td>Not Required</td><td>Array containing only the specified Project object without associated palettes</td></tr>
+    <tr><td>/api/v1/users/projects/new</td><td>POST</td><td>{user_id: num, name: 'string', description: 'string'}</td><td>Array containing object with the ID of the created Project</td></tr>
+    <tr><td>/api/v1/users/projects/:id/edit</td><td>PATCH</td><td>{name: 'string', description: 'string'}</td><td>Array containing object with the id and name of the edited Project</td></tr>
+    <tr><td>/api/v1/users/:user_id/projects/:id</td><td>DELETE</td><td>Not Required</td><td>ID of the deleted Project</td></tr>
+    <tr><td>/api/v1/users/:user_id/palettes</td><td>GET</td><td>Not Required</td><td>Array of all palettes associated with the user</td></tr> 
+    <tr><td>/api/v1/users/projects/:project_id/palettes</td><td>POST</td><td>{name: 'string', colors: [array of color hex codes as strings]}</td><td>ID of the newly created palette</td></tr> 
+    <tr><td>/api/v1/projects/:project_id/palettes/:palette_id</td><td>DELETE</td><td>Not Required</td><td>ID of the successfully deleted palette</td></tr>
+  </table>
+</body> 
+
+
+
+
 </html>
