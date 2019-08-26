@@ -218,6 +218,22 @@ app.post(
   }
 );
 
+app.delete(
+  '/api/v1/projects/:project_id/palettes/:palette_id',
+  async (request, response) => {
+    const { project_id, palette_id } = request.params;
+    try {
+      await database('palettes')
+        .where('project_id', project_id)
+        .andWhere('id', palette_id)
+        .del();
+      response.status(202).json(Number(palette_id));
+    } catch {
+      return response.sendStatus(500);
+    }
+  }
+);
+
 // app.listen(app.get('port'), () => {
 //   console.log(
 //     `${app.locals.title} is running SHIT on http://localhost:${app.get(

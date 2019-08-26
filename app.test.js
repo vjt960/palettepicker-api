@@ -358,4 +358,15 @@ describe('Palette Picker API', () => {
       expect(result).toEqual(expected);
     });
   });
+
+  describe('DELETE /api/v1/projects/:project_id/palettes/:palette_id', () => {
+    it('returns a status of 202 and deletes a selected palette from the database', async () => {
+      const testPalette = await database('palettes').first();
+      const response = await request(app).delete(
+        `/api/v1/projects/${testPalette.project_id}/palettes/${testPalette.id}`
+      );
+
+      expect(response.status).toBe(202);
+    });
+  });
 });
