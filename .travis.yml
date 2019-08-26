@@ -1,11 +1,17 @@
 language: node_js
 node_js:
-  - "node" 
-before_install: 
-  - npm install --save-dev jest 
+- node
+before_install:
+- npm install --save-dev jest
 services:
-  - postgresql
+- postgresql
 before_script:
-  - psql -c 'CREATE DATABASE palettepicker_test;' -U postgres 
-  - knex migrate:latest --env=test
-  - knex seed:run --env=test
+- psql -c 'CREATE DATABASE palettepicker_test;' -U postgres
+- knex migrate:latest --env=test
+- knex seed:run --env=test
+deploy: 
+  provider: heroku 
+  api_key:
+    secure: DwLTpeCFX4MrE3E8QsKbV6qMEgNbXiXALH4FZLVKdL7bAm4u/uslPopeBvUjFSXENqoHoxKQULvMSQQhqlfvxyy+F1nz5W/gu4Qrrc9TDgAYc1+6txcivZL3XzY8MnFPSEQg1EFqEYpseKzwZd/rdA/STyBCETB5JmvQpCBW3IkxCDDczaB25yRwA4zfdDMBQFmpw9icnC5J0fD6B0hVc518lj0S8e5S7aCPYIygtnLH3ToVB3Ui+8nnmeDMaPZR8W/v4JjkN8zt93n68lGB2cqSNd25/KKMhTW88K64uD3O82TaNw1mzRfzk8RoKiqfG9fVmzguD8giMNflYjs/HvCNe4FE7++DtT4NlFDFPGi8+cbqWseCIIQsjLouGcjRHzQny3LvyAC3cYYjUpO/Qkmh6RB0ZjhURQpLwJSotDd/eSMlOXHWVyquwr+9b/sU/MHE1kW0HZzKaP5kuqBFi6qiHTUSJHp8T+K9aVbhN3JoWKhItJEJNYMRnf6TJegFp78gh2T6rTqaXTNqI7YV6Ate64Pa3uv9GL1XTFhiVHD3CtsPaZePboTCfeuPdFxPg5yYm+n19JqZZCGwz3udV8eMXFudZGz0x2hcaTdIWhECFpBiKbM6HI/E+MkRQDRSRoPQwISLFvXRSiXRXCs7CGQ1Crzj7w97ZcT35ZpXdmE=
+  app: kra-teo-colors-api 
+  skip_cleanup: true 
