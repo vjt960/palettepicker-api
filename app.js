@@ -68,14 +68,12 @@ app.get('/api/v1/users/:user_id/projects', async (request, response) => {
       GROUP BY projects.id
     `
     );
-    // .catch(() => response.status(404).json({ error: 'Invalid user_id.' }));
     if (data.rows.length) {
       response.status(200).json(data.rows);
     } else {
       response.status(404).json({ error: 'No projects found under user_id.' });
     }
   } catch {
-    // return response.sendStatus(500);
     return response.status(404).json({ error: 'Invalid user_id.' });
   }
 });
@@ -90,12 +88,8 @@ app.get(
         .where('user_id', user_id)
         .andWhere('id', project_id)
         .select(...projectAttributes);
-      // .catch(() =>
-      //   response.status(404).json({ error: 'Invalid values within params.' })
-      // );
       response.status(200).json(project);
     } catch {
-      // return response.sendStatus(500);
       return response
         .status(404)
         .json({ error: 'Invalid values within params.' });
@@ -104,23 +98,23 @@ app.get(
 );
 
 app.post('/api/v1/users/projects/new', async (request, response) => {
-  const { id, name, description } = request.body;
+  const { user_id, name, description } = request.body;
   try {
-    if (id) {
+    if (user_id) {
       const activeID = await database('users')
-        .where('id', id)
+        .where('id', user_id)
         .select('id');
       if (activeID.length) {
         const existngName = await database('projects')
-          .where('user_id', id)
+          .where('user_id', user_id)
           .andWhere('name', name)
           .select();
         if (!existngName.length) {
           const newID = await database('projects').insert(
-            { user_id: id, name, description },
+            { user_id, name, description },
             'id'
           );
-          response.status(201).json(newID);
+          response.status(201).json({ id: newID[0] });
         } else {
           response.status(409).json({
             error: `${name} already exists. Choose a different name.`
@@ -129,7 +123,7 @@ app.post('/api/v1/users/projects/new', async (request, response) => {
       } else {
         return response
           .status(422)
-          .json({ error: `${id} is NOT a valid user ID.` });
+          .json({ error: `${user_id} is NOT a valid user ID.` });
       }
     } else {
       return response

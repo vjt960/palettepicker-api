@@ -69,7 +69,6 @@ describe('Palette Picker API', () => {
         .post('/api/v1/users/new')
         .send(mockBody);
       const result = response.body;
-      console.log(result);
       const expected = await database('users')
         .where('id', result.id)
         .select('id')
@@ -175,7 +174,7 @@ describe('Palette Picker API', () => {
         .first()
         .select();
       const mockBody = {
-        id: testUser.id,
+        user_id: testUser.id,
         name: 'new_Project001',
         description: 'example description text'
       };
@@ -184,12 +183,12 @@ describe('Palette Picker API', () => {
         .send(mockBody);
       const result = response.body;
       const expected = await database('projects')
-        .where('id', ...result)
+        .where('id', result.id)
         .select('id')
         .then(project => project[0]);
 
       expect(response.status).toBe(201);
-      expect(...result).toEqual(expected.id);
+      expect(result).toEqual(expected);
     });
 
     it('should return a status of 404 if user_id is not in payload', async () => {
@@ -212,7 +211,7 @@ describe('Palette Picker API', () => {
         .max('id')
         .then(obj => obj[0]['max'] + 1);
       const mockBody = {
-        id: invalidID,
+        user_id: invalidID,
         name: 'new_Project001',
         description: 'example description text'
       };
@@ -229,7 +228,7 @@ describe('Palette Picker API', () => {
     it('should return a status of 409 if a project exists with the same name', async () => {
       const testProject = await database('projects').first();
       const mockBody = {
-        id: testProject.user_id,
+        user_id: testProject.user_id,
         name: testProject.name,
         description: 'example text...'
       };
