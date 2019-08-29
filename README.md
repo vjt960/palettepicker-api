@@ -1,7 +1,8 @@
 # Palette Picker - API
 
 ## Description 
-A RESTful API built with Express and Knex to support the [PalettePicker Front-End UI](https://github.com/KevinKra/PalettePicker-fe).
+A RESTful API built with Express and Knex to support the [PalettePicker Front-End UI](https://github.com/KevinKra/PalettePicker-fe). 
+[Heroku app](https://kra-teo-colors-api.herokuapp.com)
 
 ## Schema 
 ![Schema](assets/images/palettepicker-schema.png)
